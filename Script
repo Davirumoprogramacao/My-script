@@ -1,0 +1,2 @@
+game.Players.LocalPlayer.Character.Humanoid.JumpPower = 50
+game.Players.LocalPlayer.Character.Humanoid.JumpPower = 50
