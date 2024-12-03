@@ -62,5 +62,7 @@ local aba = Tab:AddLabel("Walkspeed: " .. game.Players.LocalPlayer.Character.Hum
 while true do
     aba:SetText("Walkspeed: " .. game.Players.LocalPlayer.Character.Humanoid.WalkSpeed)
     wait(1)
+end
+--loadstring(game:HttpGet("https://raw.githubusercontent.com/Davirumoprogramacao/My-script/main/Script"))()
 -- Inicializando a UI
 OrionLib:Init()
