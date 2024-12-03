@@ -1,2 +1,63 @@
-game.Players.LocalPlayer.Character.Humanoid.JumpPower = 50
-game.Players.LocalPlayer.Character.Humanoid.JumpPower = 50
+local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/shlexware/Orion/main/source')))()
+
+-- Criando a janela principal
+local Window = OrionLib:MakeWindow({
+    Name = "Teste",
+    HidePremium = false,
+    SaveConfig = true,
+    ConfigFolder = "MinhaConfig"
+})
+
+-- Criando uma aba
+local Tab = Window:MakeTab({
+    Name = "Texto",
+    Icon = "rbxassetid://4483345998",
+    PremiumOnly = false
+})
+
+-- Adicionando uma caixa de texto
+Tab:AddTextbox({
+    Name = "Player para teleportar",
+    Default = "",
+    TextDisappear = true, -- Faz o texto sumir ao clicar
+    Callback = function(Value)
+        local CFrame = game.Players[Value].Character.HumanoidRootPart.CFrame
+        if CFrame then
+            OrionLib:MakeNotification({
+                Name = "Sucess",
+                Content = "Successfully teleporting.",
+                Image = "rbxassetid://4483345998",
+                Time = 5
+            })
+            local player = game.Players.LocalPlayer.Character.HumanoidRootPart
+            local humanoid = game.Players.LocalPlayer.Character.Humanoid
+
+            humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+            wait(0.1)
+            player.CFrame = game.Players[Value].Character.HumanoidRootPart.CFrame
+        end
+    end
+})
+Tab:AddTextbox({
+  	Name = "Velocidade",
+  	Default = "",
+  	TextDisappear = true,
+  	Callback = function(Value)
+  	    local player = game.Players.LocalPlayer.Character.Humanoid
+  	    player.WalkSpeed = Value
+	end	
+})
+Tab:AddButton({
+  	Name = "Reset velocidade",
+  	Callback = function()
+  	    local speed = game.Players.LocalPlayer.Character.Humanoid.WalkSpeed
+  	    if speed ~= 16 then
+  	        game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = 16
+  	    else
+  	        return
+  	    end
+    	end
+  })
+
+-- Inicializando a UI
+OrionLib:Init()
