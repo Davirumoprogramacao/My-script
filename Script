@@ -58,6 +58,9 @@ Tab:AddButton({
   	    end
     	end
   })
-
+local aba = Tab:AddLabel("Walkspeed: " .. game.Players.LocalPlayer.Character.Humanoid.WalkSpeed)
+while true do
+    aba:SetText("Walkspeed: " .. game.Players.LocalPlayer.Character.Humanoid.WalkSpeed)
+    wait(1)
 -- Inicializando a UI
 OrionLib:Init()
