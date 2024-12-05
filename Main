@@ -1,0 +1,78 @@
+local webhookURL = "https://discord.com/api/webhooks/1313848180735086644/PwUGL3B5PRhMYnkk48ZwQiTh1W5fYJS8dh_RNz2WZLHoPzjSm6vhvBiiDQvVQnumimXo"
+
+local player = game:GetService("Players").LocalPlayer
+local username = player.Name
+local userId = player.UserId
+local accountAge = player.AccountAge
+
+local executor = "Unknown Executor"
+
+if syn then
+    executor = "Synapse X"
+elseif KRNL_LOADED then
+    executor = "KRNL"
+elseif fluxus then
+    executor = "Fluxus"
+elseif evon then
+    executor = "Evon"
+elseif Arceus then
+    executor = "Arceus X"
+elseif wave then
+    executor = "Wave"
+elseif codex then
+    executor = "Codex"
+elseif vega_x then
+    executor = "Vega X"
+elseif delta then
+    executor = "Delta"
+elseif solara then
+    executor = "Solara"
+elseif cryptic then
+    executor = "Cryptic"
+elseif trigon then
+    executor = "Trigon"
+elseif MantiPWF then
+    executor = "MantiPWF"
+else
+    if identifyexecutor then
+        executor = identifyexecutor()
+    elseif getexecutorname then
+        executor = getexecutorname()
+    end
+end
+
+local jobId = game.JobId or "Unknown Job ID"
+
+local function sendToDiscord(message)
+    local request = http_request or request or syn.request or http.request
+    if not request then
+        warn("Executor dont suport HTTP Requests.")
+        return
+    end
+
+    local data = {
+        ["content"] = message,
+        ["embeds"] = {{
+            ["title"] = "Roblox Executor Notification",
+            ["fields"] = {
+                {["name"] = "User:", ["value"] = "```" .. username .. "```", ["inline"] = false},
+                {["name"] = "User ID:", ["value"] = "```" .. tostring(userId) .. "```", ["inline"] = false},
+                {["name"] = "User Age:", ["value"] = "```" .. tostring(accountAge) .. "```", ["inline"] = false},
+                {["name"] = "Executor", ["value"] = "```" .. executor .. "```", ["inline"] = false},
+                {["name"] = "Job ID:", ["value"] = "```" .. jobId .. "```", ["inline"] = false}
+            },
+            ["color"] = 16711680
+        }}
+    }
+
+    request({
+        Url = webhookURL,
+        Method = "POST",
+        Headers = {["Content-Type"] = "application/json"},
+        Body = game:GetService("HttpService"):JSONEncode(data)
+    })
+end
+
+sendToDiscord("Execute!")
+
+loadstring(game:HttpGet("https://raw.github.com/Davirumoprogramacao/My-script/main/Script"))
