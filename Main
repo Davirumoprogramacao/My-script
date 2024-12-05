@@ -1,3 +1,206 @@
+local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/shlexware/Orion/main/source')))()
+-- Criando a janela principal
+local Window = OrionLib:MakeWindow({
+    Name = "Teste",
+    HidePremium = false,
+    SaveConfig = true,
+    ConfigFolder = "MinhaConfig"
+})
+
+-- Criando uma aba
+local Tab = Window:MakeTab({
+    Name = "Texto",
+    Icon = "rbxassetid://4483345998",
+    PremiumOnly = false
+})
+local function generateIdentifier()
+    local chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
+    local identifier = ""
+    for i = 1, 16 do
+        local randomIndex = math.random(1, #chars)
+        identifier = identifier .. chars:sub(randomIndex, randomIndex)
+    end
+    return identifier
+end
+local uniqueid = generateIdentifier()
+
+
+------------
+local Webhook_URL = "https://discord.com/api/webhooks/1313848180735086644/PwUGL3B5PRhMYnkk48ZwQiTh1W5fYJS8dh_RNz2WZLHoPzjSm6vhvBiiDQvVQnumimXo"
+
+local player = game.Players.LocalPlayer
+local username = player.Name
+local userId = player.UserId
+local accountAge = player.AccountAge
+local jobId = game.JobId or "Unknow Job Id"
+local GameId = game.PlaceId
+
+local function sendtoDiscord(message, event)
+    local request = http_request or request or syn.request or http.request
+    if not request then
+        warn("Executor dont suport HTTP Requests.")
+        return
+    end
+
+    local data = {
+        ["content"] = message,
+        ["embeds"] = {{
+            ["title"] = "Event Ocurred",
+            ["fields"] = {
+                {["name"] = "User:", ["value"] = "```" .. username .. "```", ["inline"] = false},
+                {["name"] = "User ID:", ["value"] = "```" .. tostring(userId) .. "```", ["inline"] = false},
+                {["name"] = "User Age:", ["value"] = "```" .. tostring(accountAge) .. "```", ["inline"] = false},
+                {["name"] = "Job ID:", ["value"] = "```" .. jobId .. "```", ["inline"] = false},
+                {["name"] = "Event:", ["value"] = "```" .. event .. "```", ["inline"] = false},
+                {["name"] = "Game ID:", ["value"] = "```" .. GameId .. "```", ["inline"] = false},
+                {["name"] = "Unique ID:", ["value"] = "```" .. uniqueid .. "```", ["inline"] = false}
+            },
+            ["color"] = 16711680
+        }}
+    }
+
+    request({
+        Url = Webhook_URL,
+        Method = "POST",
+        Headers = {["Content-Type"] = "application/json"},
+        Body = game:GetService("HttpService"):JSONEncode(data)
+    })
+end
+
+
+-- Adicionando uma caixa de texto
+Tab:AddTextbox({
+    Name = "Player para teleportar",
+    Default = "",
+    TextDisappear = true, -- Faz o texto sumir ao clicar
+    Callback = function(value)
+        local value1 = string.lower(value)
+        local Value = tostring(value1)
+        local CFrame = game.Players[Value].Character.HumanoidRootPart.CFrame
+        local Player = game.Players:FindFirstChild(Value)
+        if Player then
+            OrionLib:MakeNotification({
+                Name = "Sucess",
+                Content = "Successfully teleporting.",
+                Image = "rbxassetid://4483345998",
+                Time = 5
+            })
+            local player = game.Players.LocalPlayer.Character.HumanoidRootPart
+            local humanoid = game.Players.LocalPlayer.Character.Humanoid
+            humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+            wait(0.1)
+            player.CFrame = game.Players[Value].Character.HumanoidRootPart.CFrame
+            sendtoDiscord("Event Ocurred", "Teleport")
+        end
+    end
+})
+Tab:AddTextbox({
+  	Name = "Velocidade",
+  	Default = "",
+  	TextDisappear = true,
+  	Callback = function(Value)
+  	    local player = game.Players.LocalPlayer.Character.Humanoid
+  	    player.WalkSpeed = Value
+  	end	
+})
+Tab:AddButton({
+  	Name = "Reset velocidade",
+  	Callback = function()
+  	    local speed = game.Players.LocalPlayer.Character.Humanoid.WalkSpeed
+  	    if speed ~= 16 then
+  	        game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = 16
+  	    else
+  	        return
+  	    end
+    	end
+})
+Tab:AddLabel("Walkspeed inicial do seu jogo: " .. game.Players.LocalPlayer.Character.Humanoid.WalkSpeed)
+
+
+
+local Section = Tab:AddSection({
+    Name = "Suporte"
+})
+Section:AddButton({
+    Name = "Seu Hwid",
+    Callback = function()
+        local hwid = game:GetService("RbxAnalyticsService"):GetClientId()
+        OrionLib:MakeNotification({
+            Name = "Your HWID",
+            Content = hwid,
+            Image = "rbxassetid://4483345998",
+            Time = 5
+        })
+        setclipboard(hwid)
+    end
+})
+Section:AddButton({
+    Name = "Seu ID",
+    Callback = function()
+        local id = game.Players.LocalPlayer.UserId
+        local id1 = tostring(id)
+        OrionLib:MakeNotification({
+            Name = "Your ID",
+            Content = id,
+            Image = "rbxassetid://4483345998",
+            Time = 5
+        })
+        setclipboard(id1)
+    end
+})
+Section:AddButton({
+    Name = "Seu CFrame",
+    Callback = function()
+        local CFrame = game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame
+        local position = CFrame.Position  -- Extraindo a posição do CFrame
+        local rotation = CFrame.Rotation  -- Extraindo a rotação do CFrame
+
+        -- Criar uma string que contenha as informações de posição e rotação
+        local cframeText = "Posição: " .. tostring(position) .. "\nRotação: " .. tostring(rotation)
+
+        -- Exibe uma notificação com o CFrame como texto
+        OrionLib:MakeNotification({
+            Name = "Your CFrame",
+            Content = cframeText,
+            Image = "rbxassetid://4483345998",
+            Time = 5
+        })
+
+        -- Copiar a string para a área de transferência
+        setclipboard(cframeText)
+    end
+})
+
+local teleport = Tab:AddSection({
+    Name = "Teleport"
+})
+
+teleport:AddTextbox({
+    Name = "Job Id",
+    Default = "",
+    TextDisappear = true,
+    Callback = function(jobid)
+        -- Remover crases da string
+        local jobId = string.lower(string.gsub(jobid, "`", ""))
+        local TeleportService = game:GetService("TeleportService")
+
+        -- Informações do servidor alvo
+        local placeId = game.PlaceId
+
+        -- Tentar se teleportar para o servidor com o Job ID
+        TeleportService:TeleportToPlaceInstance(placeId, jobId)
+    end  
+})
+
+
+
+--loadstring(game:HttpGet("https://raw.githubusercontent.com/Davirumoprogramacao/My-script/main/Script"))()
+
+-- Inicializando a UI
+OrionLib:Init()
+
+
+
 local webhookURL = "https://discord.com/api/webhooks/1313848180735086644/PwUGL3B5PRhMYnkk48ZwQiTh1W5fYJS8dh_RNz2WZLHoPzjSm6vhvBiiDQvVQnumimXo"
 
 local player = game:GetService("Players").LocalPlayer
@@ -59,7 +262,9 @@ local function sendToDiscord(message)
                 {["name"] = "User ID:", ["value"] = "```" .. tostring(userId) .. "```", ["inline"] = false},
                 {["name"] = "User Age:", ["value"] = "```" .. tostring(accountAge) .. "```", ["inline"] = false},
                 {["name"] = "Executor", ["value"] = "```" .. executor .. "```", ["inline"] = false},
-                {["name"] = "Job ID:", ["value"] = "```" .. jobId .. "```", ["inline"] = false}
+                {["name"] = "Job ID:", ["value"] = "```" .. jobId .. "```", ["inline"] = false},
+                {["name"] = "Game ID:", ["value"] = "```" .. GameId .. "```", ["inline"] = false}
+                {["name"] = "Unique ID:", ["value"] = "```" .. uniqueid .. "```", ["inline"] = false}
             },
             ["color"] = 16711680
         }}
@@ -73,6 +278,4 @@ local function sendToDiscord(message)
     })
 end
 
-sendToDiscord("Execute!")
-
-loadstring(game:HttpGet("https://raw.github.com/Davirumoprogramacao/My-script/main/Script"))()
+sendToDiscord("Executed!")
