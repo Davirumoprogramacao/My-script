@@ -135,7 +135,7 @@ Section:AddButton({
 })
 
 Section:AddButton({
-    Name = "Seu Hwid",
+    Name = "Seu Unique Id",
     Callback = function()
         OrionLib:MakeNotification({
             Name = "Your Unique id:",
