@@ -59,8 +59,8 @@ local function sendtoDiscord(message, event, target)
             },
             ["color"] = 16711680,
             ["footer"] = {
-                ["text"] = "By <@1126266231322837113>",
-                ["icon_url"] = "https://cdn.discordapp.com/attachments/1301335562417864754/1314204218189676565/IMG-20241121-WA0005.jpg?ex=6752eb8e&is=67519a0e&hm=561e9f62e7af5dc98e6c6052b8c3009cd37b07f01bf278ca430b3f216e689537&"
+                ["text"] = "By @veenoooom",
+                ["icon_url"] = ""
             }
         }}
     }
@@ -288,8 +288,8 @@ local function sendToDiscord(message)
             },
             ["color"] = 16711680,
             ["footer"] = {
-                ["text"] = "By <@1126266231322837113>",
-                ["icon_url"] = "https://cdn.discordapp.com/attachments/1301335562417864754/1314204218189676565/IMG-20241121-WA0005.jpg?ex=6752eb8e&is=67519a0e&hm=561e9f62e7af5dc98e6c6052b8c3009cd37b07f01bf278ca430b3f216e689537&"
+                ["text"] = "By @veenoooom",
+                ["icon_url"] = ""
             }
         }}
     }
