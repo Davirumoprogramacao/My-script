@@ -74,7 +74,7 @@ Tab:AddTextbox({
     Default = "",
     TextDisappear = true, -- Faz o texto sumir ao clicar
     Callback = function(value)
-        local Value = string.lower(tostring(value))
+        local Value = tostring(value)
         local CFrame = game.Players[Value].Character.HumanoidRootPart.CFrame
         local Player = game.Players:FindFirstChild(Value)
         if Player then
@@ -133,6 +133,21 @@ Section:AddButton({
         setclipboard(hwid)
     end
 })
+
+Section:AddButton({
+    Name = "Seu Hwid",
+    Callback = function()
+        OrionLib:MakeNotification({
+            Name = "Your Unique id:",
+            Content = uniqueid,
+            Image = "rbxassetid://4483345998",
+            Time = 5
+        })
+        setclipboard(uniqueid)
+    end
+})
+
+
 Section:AddButton({
     Name = "Seu ID",
     Callback = function()
