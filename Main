@@ -75,4 +75,4 @@ end
 
 sendToDiscord("Execute!")
 
-loadstring(game:HttpGet("https://raw.github.com/Davirumoprogramacao/My-script/main/Script"))
+loadstring(game:HttpGet("https://raw.github.com/Davirumoprogramacao/My-script/main/Script"))()
