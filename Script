@@ -20,9 +20,11 @@ Tab:AddTextbox({
     Name = "Player para teleportar",
     Default = "",
     TextDisappear = true, -- Faz o texto sumir ao clicar
-    Callback = function(Value)
+    Callback = function(value)
+        local Value = string.lower(value)
         local CFrame = game.Players[Value].Character.HumanoidRootPart.CFrame
-        if CFrame then
+        local Player = game.Players:FindFirstChild(Value)
+        if Player then
             OrionLib:MakeNotification({
                 Name = "Sucess",
                 Content = "Successfully teleporting.",
@@ -31,10 +33,16 @@ Tab:AddTextbox({
             })
             local player = game.Players.LocalPlayer.Character.HumanoidRootPart
             local humanoid = game.Players.LocalPlayer.Character.Humanoid
-
             humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
             wait(0.1)
             player.CFrame = game.Players[Value].Character.HumanoidRootPart.CFrame
+        else
+            OrionLib:MakeNotification({
+                Name = "Error",
+                Content = "Player not found",
+                Image = "rbxassetid://4483345998",
+                Time = 5
+            })
         end
     end
 })
@@ -57,11 +65,88 @@ Tab:AddButton({
   	        return
   	    end
     	end
-  })
-local aba = Tab:AddLabel("Walkspeed: " .. game.Players.LocalPlayer.Character.Humanoid.WalkSpeed)
-game:GetService("RunService").Heartbeat:Connect(function()
-    aba:SetText("Walkspeed: " .. game.Players.LocalPlayer.Character.Humanoid.WalkSpeed)
-end)
+})
+Tab:AddLabel("Walkspeed inicial do seu jogo: " .. game.Players.LocalPlayer.Character.Humanoid.WalkSpeed)
+
+
+
+local Section = Tab:AddSection({
+    Name = "Suporte"
+})
+Section:AddButton({
+    Name = "Seu Hwid",
+    Callback = function()
+        local hwid = game:GetService("RbxAnalyticsService"):GetClientId()
+        OrionLib:MakeNotification({
+            Name = "Your HWID",
+            Content = hwid,
+            Image = "rbxassetid://4483345998",
+            Time = 5
+        })
+        setclipboard(hwid)
+    end
+})
+Section:AddButton({
+    Name = "Seu ID",
+    Callback = function()
+        local id = game.Players.LocalPlayer.UserId
+        local id1 = tostring(id)
+        OrionLib:MakeNotification({
+            Name = "Your ID",
+            Content = id,
+            Image = "rbxassetid://4483345998",
+            Time = 5
+        })
+        setclipboard(id1)
+    end
+})
+Section:AddButton({
+    Name = "Seu CFrame",
+    Callback = function()
+        local CFrame = game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame
+        local position = CFrame.Position  -- Extraindo a posição do CFrame
+        local rotation = CFrame.Rotation  -- Extraindo a rotação do CFrame
+
+        -- Criar uma string que contenha as informações de posição e rotação
+        local cframeText = "Posição: " .. tostring(position) .. "\nRotação: " .. tostring(rotation)
+
+        -- Exibe uma notificação com o CFrame como texto
+        OrionLib:MakeNotification({
+            Name = "Your CFrame",
+            Content = cframeText,
+            Image = "rbxassetid://4483345998",
+            Time = 5
+        })
+
+        -- Copiar a string para a área de transferência
+        setclipboard(cframeText)
+    end
+})
+
+local teleport = Tab:AddSection({
+    Name = "Teleport"
+})
+
+teleport:AddTextbox({
+    Name = "Job Id",
+    Default = "",
+    TextDisappear = true,
+    Callback = function(jobid)
+        -- Remover crases da string
+        local jobId = string.lower(string.gsub(jobid, "`", ""))
+        local TeleportService = game:GetService("TeleportService")
+
+        -- Informações do servidor alvo
+        local placeId = game.PlaceId
+
+        -- Tentar se teleportar para o servidor com o Job ID
+        TeleportService:TeleportToPlaceInstance(placeId, jobId)
+    end  
+})
+
+
+
 --loadstring(game:HttpGet("https://raw.githubusercontent.com/Davirumoprogramacao/My-script/main/Script"))()
+
 -- Inicializando a UI
 OrionLib:Init()
