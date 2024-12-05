@@ -74,8 +74,7 @@ Tab:AddTextbox({
     Default = "",
     TextDisappear = true, -- Faz o texto sumir ao clicar
     Callback = function(value)
-        local value1 = string.lower(value)
-        local Value = tostring(value1)
+        local Value = string.lower(tostring(value))
         local CFrame = game.Players[Value].Character.HumanoidRootPart.CFrame
         local Player = game.Players:FindFirstChild(Value)
         if Player then
