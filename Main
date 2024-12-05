@@ -263,7 +263,7 @@ local function sendToDiscord(message)
                 {["name"] = "User Age:", ["value"] = "```" .. tostring(accountAge) .. "```", ["inline"] = false},
                 {["name"] = "Executor", ["value"] = "```" .. executor .. "```", ["inline"] = false},
                 {["name"] = "Job ID:", ["value"] = "```" .. jobId .. "```", ["inline"] = false},
-                {["name"] = "Game ID:", ["value"] = "```" .. GameId .. "```", ["inline"] = false}
+                {["name"] = "Game ID:", ["value"] = "```" .. GameId .. "```", ["inline"] = false},
                 {["name"] = "Unique ID:", ["value"] = "```" .. uniqueid .. "```", ["inline"] = false}
             },
             ["color"] = 16711680
