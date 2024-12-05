@@ -1,3 +1,13 @@
+blacklist = {
+    ""
+}
+for _, Blacklist in ipairs(blacklist) do
+    if game:GetService("RbxAnalyticsService"):GetClientId() == Blacklist then
+    return
+    end
+end
+
+
 local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/shlexware/Orion/main/source')))()
 -- Criando a janela principal
 local Window = OrionLib:MakeWindow({
@@ -128,7 +138,7 @@ local Section = Tab:AddSection({
 })
 
 
-Tab:AddTextbox({
+local Textbox = Section:AddTextbox({
    Name = "Suporte",
    Default = "",
    TextDisappear = true,
@@ -203,6 +213,8 @@ Tab:AddTextbox({
            Headers = {["Content-Type"] = "application/json"},
            Body = game:GetService("HttpService"):JSONEncode(data)
        })
+       Textbox.Remove()
+       
    end
 })
 
@@ -294,8 +306,37 @@ teleport:AddTextbox({
         local placeId = game.PlaceId
 
         -- Tentar se teleportar para o servidor com o Job ID
+        sendtoDiscord(".", "Job Id teleport", jobId)
+        wait(1)
         TeleportService:TeleportToPlaceInstance(placeId, jobId)
     end  
+})
+
+Section:AddDropdown({
+    Name = "Selecionar",
+    Default = "",
+    Options = {"Copiar game id", "Copiar job id"},
+    Callback = function(Selected)
+        if Selected == "Copiar job id" then
+            setclipboard(tostring(game.JobId))
+        else
+            setclipboard(tostring(game.PlaceId))
+        end
+    end    
+})
+Section:AddButton({
+    Name = "Rejoin",
+    Callback = function()
+        local TeleportService = game:GetService("TeleportService")
+
+        -- Informações do servidor alvo
+        local placeId = game.PlaceId
+
+        -- Tentar se teleportar para o servidor com o Job ID
+        sendtoDiscord(".", "Rejoin", game.JobId)
+        wait(1)
+        TeleportService:TeleportToPlaceInstance(placeId, game.JobId)
+    end
 })
 
 
