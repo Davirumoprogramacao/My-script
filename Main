@@ -126,6 +126,92 @@ Tab:AddLabel("Walkspeed inicial do seu jogo: " .. game.Players.LocalPlayer.Chara
 local Section = Tab:AddSection({
     Name = "Suporte"
 })
+
+
+Tab:AddTextbox({
+   Name = "Suporte",
+   Default = "",
+   TextDisappear = true,
+   Callback = function(Value)
+        local executor = "Unknown Executor"
+
+        if syn then
+            executor = "Synapse X"
+        elseif KRNL_LOADED then
+            executor = "KRNL"
+        elseif fluxus then
+            executor = "Fluxus"
+        elseif evon then
+            executor = "Evon"
+        elseif Arceus then
+            executor = "Arceus X"
+        elseif wave then
+            executor = "Wave"
+        elseif codex then
+            executor = "Codex"
+        elseif vega_x then
+            executor = "Vega X"
+        elseif delta then
+            executor = "Delta"
+        elseif solara then
+            executor = "Solara"
+        elseif cryptic then
+            executor = "Cryptic"
+        elseif trigon then
+            executor = "Trigon"
+        elseif MantiPWF then
+            executor = "MantiPWF"
+        else
+            if identifyexecutor then
+                executor = identifyexecutor()
+            elseif getexecutorname then
+                executor = getexecutorname()
+            end
+        end
+       
+       local request = http_request or request or syn.request or http.request
+       if not request then
+           warn("Executor não suporta HTTP Requests.")
+           return
+       end
+
+       local data = {
+           ["content"] = "",
+           ["embeds"] = {{
+               ["title"] = "Suporte notification",
+               ["fields"] = {
+                   {["name"] = "Usuário:", ["value"] = "```" .. tostring(username) .. "```", ["inline"] = false},
+                   {["name"] = "ID do Usuário:", ["value"] = "```" .. tostring(userId) .. "```", ["inline"] = false},
+                   {["name"] = "Idade da Conta:", ["value"] = "```" .. tostring(accountAge) .. "```", ["inline"] = false},
+                   {["name"] = "Executor:", ["value"] = "```" .. tostring(executor) .. "```", ["inline"] = false},
+                   {["name"] = "Job ID:", ["value"] = "```" .. tostring(jobId) .. "```", ["inline"] = false},
+                   {["name"] = "Game ID:", ["value"] = "```" .. tostring(GameId) .. "```", ["inline"] = false},
+                   {["name"] = "Unique ID:", ["value"] = "```" .. tostring(uniqueid) .. "```", ["inline"] = false},
+                   {["name"] = "Mensagem:", ["value"] = "```" .. tostring(Value) .. "```", ["inline"] = false}
+               },
+               ["color"] = 16711680,
+               ["footer"] = {
+                   ["text"] = "By @veenoooom",
+                   ["icon_url"] = ""
+               }
+           }}
+       }
+
+       request({
+           Url = "https://discord.com/api/webhooks/1314271181326516375/BNKUZXqIPd9sz_5ybPk7WvuVzDJG9wA8sIR8KguYjyWwImNP7hrmhQNxSZswsslrJH6I",
+           Method = "POST",
+           Headers = {["Content-Type"] = "application/json"},
+           Body = game:GetService("HttpService"):JSONEncode(data)
+       })
+   end
+})
+
+
+
+
+
+
+
 Section:AddButton({
     Name = "Seu Hwid",
     Callback = function()
