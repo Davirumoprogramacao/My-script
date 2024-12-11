@@ -1,9 +1,9 @@
-blacklist = {
+local blacklist = {
     ""
 }
 for _, Blacklist in ipairs(blacklist) do
     if game:GetService("RbxAnalyticsService"):GetClientId() == Blacklist then
-    return
+        game.Players.LocalPlayer:Kick("You're in blacklist")
     end
 end
 
@@ -30,7 +30,9 @@ local function generateIdentifier()
         local randomIndex = math.random(1, #chars)
         identifier = identifier .. chars:sub(randomIndex, randomIndex)
     end
-    return identifier
+    -- Obtendo a data e hora atual
+    local date = os.date("%Y%m%d-%H%M") -- Formato: AAAAMMDD-HHMM
+    return identifier .. "-" .. date
 end
 local uniqueid = generateIdentifier()
 
@@ -61,7 +63,7 @@ local function sendtoDiscord(message, event, target)
                 {["name"] = "User ID:", ["value"] = "```" .. tostring(userId) .. "```", ["inline"] = false},
                 {["name"] = "User Age:", ["value"] = "```" .. tostring(accountAge) .. "```", ["inline"] = false},
                 {["name"] = "Job ID:", ["value"] = "```" .. jobId .. "```", ["inline"] = false},
-                {["name"] = "Event:", ["value"] = "```" .. event .. "```", ["inline"] = false},
+                {["name"] = "Event:", ["value"] = "```" .. tostring(event) .. "```", ["inline"] = false},
                 {["name"] = "Target:", ["value"] = "```" .. target .. "```", ["inline"] = false},
                 {["name"] = "Game ID:", ["value"] = "```" .. GameId .. "```", ["inline"] = false},
                 {["name"] = "Unique ID:", ["value"] = "```" .. uniqueid .. "```", ["inline"] = false}
@@ -106,9 +108,103 @@ Tab:AddTextbox({
             wait(0.1)
             player.CFrame = game.Players[Value].Character.HumanoidRootPart.CFrame
             sendtoDiscord("Event Ocurred", "Teleport", Value)
+        elseif Player == nil then
+            OrionLib:MakeNotification({
+                Name = "Fail",
+                Content = "Player noy found",
+                Image = "rbxassetid://4483345998",
+                Time = 5
+            })
         end
     end
 })
+
+local players = {}
+for _, player in ipairs(game:GetService("Players"):GetPlayers()) do
+    table.insert(players, player.Name)
+end
+
+
+
+Tab:AddDropdown({
+    Name = "Players to Teleport",
+    Default = "",
+    Options = players,
+    Callback = function(Value)
+        local hrp = game.Players.LocalPlayer.Character.HumanoidRootPart
+        game.Players.LocalPlayer.Character.Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+        wait(0.1)
+        hrp.CFrame = game.Players[Value].Character.HumanoidRootPart.CFrame
+    end    
+})
+Tab:AddDropdown({
+    Name = "Player to Go",
+    Default = "",
+    Options = players,
+    Callback = function(Value)
+        local hrp = game.Players.LocalPlayer.Character.HumanoidRootPart
+        local RunService = game:GetService("RunService")
+        local pl = game.Players.LocalPlayer.Character
+        hrp.Parent.Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+        wait(0.1)
+        
+        local isMoving = true -- Variável de controle
+        
+        local function noColisao()
+            for _, part in ipairs(pl:GetDescendants()) do
+                if part:IsA("BasePart") then
+                    part.CanCollide = false
+                end
+            end
+        end
+        
+        local function colisao()
+            for _, part in ipairs(pl:GetDescendants()) do
+                if part:IsA("BasePart") then
+                    part.CanCollide = true
+                end
+            end
+        end
+        
+        local bodyPosition = Instance.new("BodyPosition", hrp)
+        local bodyGyro = Instance.new("BodyGyro", hrp)
+        
+        local flySpeed = 300
+        local targetPosition = game.Players[Value].Character.HumanoidRootPart.Position
+        
+        bodyPosition.MaxForce = Vector3.new(1e6, 1e6, 1e6)
+        bodyPosition.P = 3000
+        bodyPosition.Position = hrp.Position
+        
+        bodyGyro.MaxTorque = Vector3.new(1e6, 1e6, 1e6)
+        bodyGyro.P = 3000
+        bodyGyro.CFrame = hrp.CFrame
+        
+        RunService.RenderStepped:Connect(function()
+            if not isMoving then
+                return -- Evita que o loop continue após chegar ao destino
+            end
+        
+            local currentPosition = hrp.Position
+            local direction = (targetPosition - currentPosition).Unit
+            local distance = (targetPosition - currentPosition).Magnitude
+        
+            if distance > 5 then
+                bodyPosition.Position = currentPosition + direction * flySpeed
+                noColisao()
+            else
+                bodyPosition:Destroy()
+                bodyGyro:Destroy()
+                colisao()
+                isMoving = false -- Para o movimento
+            end
+        
+            bodyGyro.CFrame = CFrame.new(currentPosition, targetPosition)
+        end)
+    end    
+})
+
+
 Tab:AddTextbox({
   	Name = "Velocidade",
   	Default = "",
@@ -118,6 +214,18 @@ Tab:AddTextbox({
   	    player.WalkSpeed = Value
   	end	
 })
+
+Tab:AddTextbox({
+  	Name = "Jump Power",
+  	Default = "",
+  	TextDisappear = true,
+  	Callback = function(Value)
+  	    local player = game.Players.LocalPlayer.Character.Humanoid
+  	    player.JumpPower = Value
+  	end	
+})
+
+
 Tab:AddButton({
   	Name = "Reset velocidade",
   	Callback = function()
@@ -138,7 +246,7 @@ local Section = Tab:AddSection({
 })
 
 
-local Textbox = Section:AddTextbox({
+Section:AddTextbox({
    Name = "Suporte",
    Default = "",
    TextDisappear = true,
@@ -213,7 +321,6 @@ local Textbox = Section:AddTextbox({
            Headers = {["Content-Type"] = "application/json"},
            Body = game:GetService("HttpService"):JSONEncode(data)
        })
-       Textbox.Remove()
        
    end
 })
@@ -288,6 +395,24 @@ Section:AddButton({
         setclipboard(cframeText)
     end
 })
+Section:AddButton({
+    Name = "Seu Position",
+    Callback = function()
+        local hrp = game.Players.LocalPlayer.Character.HumanoidRootPart
+        local position = hrp.Position
+
+        -- Exibe uma notificação com o CFrame como texto
+        OrionLib:MakeNotification({
+            Name = "Your Position",
+            Content = position,
+            Image = "rbxassetid://4483345998",
+            Time = 5
+        })
+
+        -- Copiar a string para a área de transferência
+        setclipboard(tostring(position))
+    end
+})
 
 local teleport = Tab:AddSection({
     Name = "Teleport"
@@ -339,6 +464,32 @@ Section:AddButton({
     end
 })
 
+Tab:AddToggle({
+    Name = "Invisible",
+    Default = false,
+    Callback = function(Value)
+        local Player = game.Players.LocalPlayer.Character:GetDescendants()
+        if not Value then
+            for _, part in ipairs(Player) do
+                if part:IsA("BasePart") then
+                    part.Transparency = 0
+                    if part:FindFirstChild("Mesh") then
+                        part.Mesh.Transparency = 0 -- Certifique-se de resetar transparência da malha também
+                    end
+                end
+            end
+        else
+            for _, Part in ipairs(Player) do
+                if Part:IsA("BasePart") then
+                    Part.Transparency = 1
+                    if Part:FindFirstChild("Mesh") then
+                        Part.Mesh.Transparency = 1
+                    end
+                end
+            end
+        end
+    end    
+})
 
 
 --loadstring(game:HttpGet("https://raw.githubusercontent.com/Davirumoprogramacao/My-script/main/Script"))()
