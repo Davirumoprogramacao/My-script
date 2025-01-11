@@ -1,3 +1,13 @@
+local CorrectKeys = {
+  "LHPLAYZacess",
+  "RandomPersonAcess"
+}
+for _, verify in ipairs(CorrectKeys) do
+  if getgenv().Key ~= CorrectKeys then
+    print("Acess Denied")
+  end
+end
+
 local Players = game:GetService("Players")
 
 local RunService = game:GetService("RunService")
@@ -191,6 +201,11 @@ local Island = Window:MakeTab({
   Icon = "rbxassetid://4483345998",
   PremiumOnly = false
 })
+local Shop = Window:MakeTab({
+  Name = "Shop",
+  Icon = "rbxassetid://4483345998",
+  PremiumOnly = false
+})
 local Misc = Window:MakeTab({
   Name = "Misc",
   Icon = "rbxassetid://4483345998",
@@ -235,6 +250,51 @@ Teleport:AddButton({
   end
 })
 --Island
+--Shop
+local FightingStyles = {
+  "SanguineArt",
+  "Godhuman",
+  "SharkmanKarate",
+  "ElectricClaw",
+  "Superhuman",
+  "DragonTalon",
+  "DeathStep",
+  "BlackLeg",
+  "FishmanKarate",
+  "DragonBreath",
+  "Electric"
+}
+local Buy = nil
+Shop:AddDropdown({
+  Name = "Fighting Styles",
+  Default = "",
+  Options = FightingStyles,
+  Callback = function(Value)
+    Buy = Value
+  end    
+})
+Shop:AddButton({
+  Name = "Buy Fighting Style",
+  Callback = function()
+    if Buy ~= "DragonBreath" then
+      Comprar(Buy)
+    else
+      local args1 = {
+        [1] = "BlackbeardReward",
+        [2] = "DragonClaw",
+        [3] = "1"
+      }
+      game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer(unpack(args1))
+      
+      local args = {
+        [1] = "BlackbeardReward",
+        [2] = "DragonClaw",
+        [3] = "2"
+      }
+      game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer(unpack(args))
+    end
+  end
+})
 -- Misc
 local Game = Misc:AddSection({
   Name = "Game"
