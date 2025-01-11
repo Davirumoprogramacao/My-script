@@ -2,11 +2,18 @@ local CorrectKeys = {
   "LHPLAYZacess",
   "RandomPersonAcess"
 }
+local CanAcess = false
 for _, verify in ipairs(CorrectKeys) do
   if getgenv().Key ~= CorrectKeys then
-    print("Acess Denied")
+    CanAcess = true
+  else
+    CanAcess = false
   end
 end
+if not CanAcess then
+  print("Acess Denied")
+end
+
 
 local Players = game:GetService("Players")
 
