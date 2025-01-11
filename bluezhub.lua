@@ -1,21 +1,33 @@
+-- Lista de chaves válidas
 local CorrectKeys = {
   "LHPLAYZacess",
   "RandomPersonAcess"
 }
-local CanAcess = false
 
-if getgenv().Key then
-  for _, verify in ipairs(CorrectKeys) do
-    if getgenv().Key == verify then
-      CanAcess = true
-    end
+-- Verifica se a chave foi definida
+if not getgenv().Key then
+  print("Nenhuma chave foi definida. Acesso negado.")
+  return
+end
+
+-- Valida a chave
+local CanAcess = false
+for _, verify in ipairs(CorrectKeys) do
+  if getgenv().Key == verify then
+    CanAcess = true
+    break
   end
 end
 
+-- Impede a execução se a chave for inválida
 if not CanAcess then
-  print("Access Denied")
-  return -- Interrompe a execução do restante do script
+  print("Chave inválida. Acesso negado.")
+  return
 end
+
+-- Código principal do script
+print("Acesso garantido! Executando o script...")
+-- Coloque aqui o código principal que será executado
 
 
 local Players = game:GetService("Players")
