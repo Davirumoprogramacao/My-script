@@ -3,15 +3,18 @@ local CorrectKeys = {
   "RandomPersonAcess"
 }
 local CanAcess = false
-for _, verify in ipairs(CorrectKeys) do
-  if getgenv().Key ~= CorrectKeys then
-    CanAcess = true
-  else
-    CanAcess = false
+
+if getgenv().Key then
+  for _, verify in ipairs(CorrectKeys) do
+    if getgenv().Key == verify then
+      CanAcess = true
+    end
   end
 end
+
 if not CanAcess then
-  print("Acess Denied")
+  print("Access Denied")
+  return -- Interrompe a execução do restante do script
 end
 
 
