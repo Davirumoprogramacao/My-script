@@ -1,3 +1,32 @@
+local Whitelist = {
+  "BT42OOR54XV2CT15",
+  "H04Ece30ZkVEbRHW",
+  "G8mL0Xp4RzW7FjKy",
+  "T2vKp9AeQd5LX3Ho",
+  "J4ZFbX7mYtK8rWv2",
+  "N3LXp6JkT9AeH0Wz",
+  "R5W7LXp2Y8mK9ZFb"
+}
+if not getgenv().Key then
+  print("Nenhuma chave foi definida. Acesso negado.")
+  return
+end
+
+-- Valida a chave
+local CanAcess = false
+for _, verify in ipairs(Whitelist) do
+  if getgenv().Key == verify then
+    CanAcess = true
+    break
+  end
+end
+-- Impede a execução se a chave for inválida
+if not CanAcess then
+  print("Chave inválida. Acesso negado.")
+  return
+end
+
+
 if game.PlaceId ~= 4924922222 then
   return
 end
@@ -24,7 +53,13 @@ RunService.RenderStepped:Connect(function()
   ch = pl.Character
   hum = ch.HumanoidRootPart
   backpack = pl.Backpack
-  humanoid = ch.Humanoid
+  humanoid = ch.Humanoidu
+end)
+RunService.RenderStepped:Connect(function()
+  players = {} -- Limpa a tabela
+  for _, player in ipairs(Players:GetPlayers()) do
+    table.insert(players, player.Name) -- Adiciona nomes dos jogadores
+  end
 end)
 
 local AutoUnban = nil
@@ -107,22 +142,70 @@ end
 -- Script Local
 
 -- Função para teletransportar o jogador local para trás de outro jogador
-local function teleportBehindPlayer(targetPlayerName)
-    local targetPlayer = game.Players:FindFirstChild(targetPlayerName)
-    if targetPlayer and targetPlayer.Character and targetPlayer.Character:FindFirstChild("HumanoidRootPart") then
-        local targetPosition = targetPlayer.Character.HumanoidRootPart.Position
-        -- Distância atrás do jogador alvo (ajuste o valor de "distance" conforme necessário)
-        local distance = 5
-        local direction = (targetPlayer.Character.HumanoidRootPart.CFrame.LookVector * -1) -- Direção oposta ao olhar
-        local teleportPosition = targetPosition + direction * distance
-        
-        -- Teleporta o jogador local
-        pl.Character:SetPrimaryPartCFrame(CFrame.new(teleportPosition))
-    else
-        warn("Jogador não encontrado ou não está com o personagem carregado.")
-    end
+local function TeleportAround(player)
+  local Players = game:GetService("Players")
+  local RunService = game:GetService("RunService")
+  
+  local localPlayer = Players.LocalPlayer
+  local targetPlayer = Players:FindFirstChild(player) -- Substitua pelo nome do jogador alvo.
+  
+  if not targetPlayer then
+      warn("Jogador alvo não encontrado!")
+      return
+  end
+  
+  local targetCharacter = targetPlayer.Character or targetPlayer.CharacterAdded:Wait()
+  local humanoid = targetCharacter:WaitForChild("Humanoid")
+  local targetRoot = targetCharacter:WaitForChild("HumanoidRootPart")
+  
+  local myCharacter = localPlayer.Character or localPlayer.CharacterAdded:Wait()
+  local myRoot = myCharacter:WaitForChild("HumanoidRootPart")
+  
+  local teleporting = true -- Controle do loop de teleporte
+  
+  -- Função para teleportar ao redor do jogador alvo
+  local function teleportAroundTarget()
+      if not targetRoot or not myRoot then return end
+  
+      -- Define raio horizontal e vertical para teleporte
+      local radiusHorizontal = 5
+      local radiusVertical = 5
+  
+      -- Calcula uma posição aleatória ao redor do jogador alvo
+      local angle = math.rad(math.random(0, 360))
+      local offsetHorizontal = Vector3.new(math.cos(angle) * radiusHorizontal, 0, math.sin(angle) * radiusHorizontal)
+      local offsetVertical = Vector3.new(0, math.random(-radiusVertical, radiusVertical), 0)
+  
+      -- Posição final
+      local teleportPosition = targetRoot.Position + offsetHorizontal + offsetVertical
+  
+      -- Move o jogador para a posição calculada e ajusta a rotação para olhar para o alvo
+      myRoot.CFrame = CFrame.new(teleportPosition, targetRoot.Position)
+  end
+  
+  -- Monitorar o estado do Humanoid e interromper o loop quando o alvo sentar
+  humanoid.StateChanged:Connect(function(_, newState)
+      if newState == Enum.HumanoidStateType.Seated then
+          print("Jogador alvo está sentado. Parando teleporte.")
+          teleporting = false
+      end
+  end)
+  
+  -- Loop de teleporte contínuo
+  local onceDid = false
+  RunService.Heartbeat:Connect(function()
+      if teleporting then
+        teleportAroundTarget()
+        task.wait(0.1) -- Tempo entre os teleportes
+      elseif not teleporting and not onceDid then
+        local Teleport = Vector3.new(-213.10760498046875, -456.403564453125, 116.18391418457031)
+        hum.Position = Teleport
+        wait(.1)
+        RemoveObject("Stretcher")
+        onceDid = true
+      end
+  end)
 end
-
 -- Making UI
 local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/shlexware/Orion/main/source')))()
 local Window = OrionLib:MakeWindow({Name = "Bluez Brookhaven🏡", HidePremium = false, SaveConfig = true, ConfigFolder = "Bluez Brookhaven"})
@@ -239,6 +322,91 @@ Invisible:AddButton({
     game:GetService("ReplicatedStorage").RE:FindFirstChild("1Clothe1s"):FireServer(unpack(args))
   end
 })
+local kill = Troll:AddSection({
+  Name = "Kill"
+})
+local playerToKill = nil
+local killDropdown = kill:AddDropdown({
+  Name = "Select Player",
+  Default = "",
+  Options = players,
+  Callback = function(Option)
+    playerToKill = Option
+  end
+})
+kill:AddButton({
+  Name = "Refresh",
+  Callback = function()
+    killDropdown:Refresh(players, true) 
+  end
+})
+kill:AddButton({
+  Name = "Kill",
+  Callback = function()
+    local Teleport = Vector3.new(-213.10760498046875, -456.403564453125, 116.18391418457031)
+    TakeObject("Stretcher")
+    humanoid:EquipTool(backpack:FindFirstChild("Stretcher"))
+    TeleportAround(tostring(playerToKill))
+  end
+})
+kill:AddButton({
+  Name = "Sit esp",
+  Callback = function()
+    -- Obtém o jogador local
+    local localPlayer = game.Players.LocalPlayer
+    
+    -- Loop para monitorar os jogadores
+    game:GetService("RunService").RenderStepped:Connect(function()
+        for _, player in pairs(game.Players:GetPlayers()) do
+            -- Ignora o jogador local
+            if player ~= localPlayer then
+                local character = player.Character
+                local localCharacter = localPlayer.Character
+                if character and localCharacter then
+                    local humanoid = character:FindFirstChild("Humanoid")
+                    local head = character:FindFirstChild("Head")
+                    local localHead = localCharacter:FindFirstChild("Head")
+    
+                    if head and localHead and humanoid then
+                        -- Calcula a distância entre os jogadores
+                        local distance = (localHead.Position - head.Position).Magnitude
+    
+                        -- Verifica se o ESP já existe
+                        local espTag = head:FindFirstChild("ESP_Tag")
+                        if not espTag then
+                            -- Cria o BillboardGui para o ESP
+                            espTag = Instance.new("BillboardGui", head)
+                            espTag.Name = "ESP_Tag"
+                            espTag.Size = UDim2.new(8, 0, 2, 0)
+                            espTag.StudsOffset = Vector3.new(0, 2, 0)
+                            espTag.AlwaysOnTop = true
+    
+                            -- Cria a TextLabel dentro do BillboardGui
+                            local label = Instance.new("TextLabel", espTag)
+                            label.Size = UDim2.new(1, 0, 1, 0)
+                            label.BackgroundTransparency = 1
+                            label.TextColor3 = Color3.new(1, 1, 1)
+                            label.TextStrokeTransparency = 0.5
+                            label.Font = Enum.Font.SourceSansBold
+                            label.TextScaled = false
+                        end
+    
+                        -- Atualiza o texto e o tamanho das letras
+                        local label = espTag:FindFirstChildOfClass("TextLabel")
+                        if label then
+                            label.Text = player.Name .. " | Sentado: " .. tostring(humanoid.Sit)
+                            label.TextColor3 = humanoid.Sit and Color3.new(0, 1, 0) or Color3.new(1, 0, 0)
+    
+                            -- Ajusta o tamanho do texto com base na distância (ajustado para tamanhos menores)
+                            label.TextSize = math.clamp(distance / 4, 14, 20)  -- Tamanho mínimo de 14 e máximo de 20
+                        end
+                    end
+                end
+            end
+        end
+    end)
+  end
+})
 Troll:AddLabel("Coming Soon...")
 
 local Local = Window:MakeTab({
@@ -346,12 +514,19 @@ Local:AddButton({
 local Tp = Local:AddSection({
   Name = "Teleport"
 })
-Tp:AddDropdown({
+local TpDropdown = Tp:AddDropdown({
   Name = "TP Player",
   Default = "",
   Options = players,
   Callback = function(Value)
     ch.HumanoidRootPart.CFrame = game.Players[Value].Character.HumanoidRootPart.CFrame
+  end
+})
+
+Tp:AddButton({
+  Name = "Refresh",
+  Callback = function()
+    TpDropdown:Refresh(players, true) -- Atualiza o dropdown
   end
 })
 local Creditos = Window:MakeTab({
