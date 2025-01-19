@@ -1,12 +1,13 @@
 local Whitelist = {
-  "BT42OOR54XV2CT15",
-  "H04Ece30ZkVEbRHW",
+  "BT42OOR54XV2CT15", -- Key do Galaxy
+  "H04Ece30ZkVEbRHW", -- minha key
   "G8mL0Xp4RzW7FjKy",
   "T2vKp9AeQd5LX3Ho",
   "J4ZFbX7mYtK8rWv2",
   "N3LXp6JkT9AeH0Wz",
   "R5W7LXp2Y8mK9ZFb"
 }
+local Stop = nil
 if not getgenv().Key then
   print("Nenhuma chave foi definida. Acesso negado.")
   return
@@ -163,6 +164,7 @@ local function TeleportAround(player)
   
   local teleporting = true -- Controle do loop de teleporte
   
+  local did = false
   -- Função para teleportar ao redor do jogador alvo
   local function teleportAroundTarget()
       if not targetRoot or not myRoot then return end
@@ -195,14 +197,22 @@ local function TeleportAround(player)
   local onceDid = false
   RunService.Heartbeat:Connect(function()
       if teleporting then
+        if Stop then
+          return
+        end
         teleportAroundTarget()
+        did = false
         task.wait(0.1) -- Tempo entre os teleportes
       elseif not teleporting and not onceDid then
+        wait(.3)
         local Teleport = Vector3.new(-213.10760498046875, -456.403564453125, 116.18391418457031)
         hum.Position = Teleport
-        wait(.1)
-        RemoveObject("Stretcher")
+        wait(.5)
+        game.Players.LocalPlayer.Character.Humanoid:UnequipTools()
+        wait(.5)
+        game.Players.LocalPlayer.Character.Humanoid.Health = 0
         onceDid = true
+        did = true
       end
   end)
 end
@@ -341,12 +351,18 @@ kill:AddButton({
   end
 })
 kill:AddButton({
-  Name = "Kill",
+  Name = "Kill (equip Stretcher)",
   Callback = function()
+    Stop = false
     local Teleport = Vector3.new(-213.10760498046875, -456.403564453125, 116.18391418457031)
-    TakeObject("Stretcher")
     humanoid:EquipTool(backpack:FindFirstChild("Stretcher"))
     TeleportAround(tostring(playerToKill))
+  end
+})
+kill:AddButton({
+  Name = "Stop killing",
+  Callback = function()
+    Stop = true
   end
 })
 kill:AddButton({
