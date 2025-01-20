@@ -1,10 +1,27 @@
 local Whitelist = {
   "H04Ece30ZkVEbRHW", -- minha key
-  "G8mL0Xp4RzW7FjKy", -- Key do Bdivine
+  "G8mL0Xp4RzW7FjKy", -- Key do bdibine
   "T2vKp9AeQd5LX3Ho",
   "J4ZFbX7mYtK8rWv2",
   "N3LXp6JkT9AeH0Wz",
-  "R5W7LXp2Y8mK9ZFb"
+  "R5W7LXp2Y8mK9ZFb",
+  "X2Zm5LpK9Y3R7F0T",
+  "W9FbT2Lp7Xm4K8ZV",
+  "J3ZLXpK0R9Y7Wm6T",
+  "R8W5ZKXpT0Lm9Y2F",
+  "L7XpK9Zm2W4R8FbT",
+  "T9Y2W5L7KXp4Z3mR",
+  "X4LpT9R7K0W8Zm5Y",
+  "Y2R7ZFb9LXp5K4T8",
+  "T0W9LXp4Y3R5K7ZV",
+  "K5L9Y7XmT2R8W4ZF",
+  "Z7R4KXp5W8Lm2Y9T",
+  "Y3R9LXp7ZmT5W4KF",
+  "L7XpT0W9R2ZmK5Y8",
+  "K4R9W5Y3T7LmXp2ZF",
+  "R2W9LXp7T5Z3KmY8",
+  "T0Y3R9W7Lp5XmK4ZF",
+  "Z8XpT7K5R2Lm9W3Y"
 }
 local Method = nil
 local Stop = nil
@@ -603,17 +620,4 @@ Local:AddButton({
     -- Monitorar a chegada de novos props
     props.ChildAdded:Connect(function(prop)
         -- Espera um momento para garantir que o prop foi totalmente carregado
-        wait(1)
-        for _, player in ipairs(Players:GetPlayers()) do
-            if prop.Name == "Prop" .. player.Name then
-                createESPForProp(prop, player)
-            end
-        end
-    end)
-
-    -- Criar ESP para todos os props existentes no momento
-    checkAndCreateESPForNewProps()
-  end
-})
-local Tp = Local:AddSection({
-  Name = "Te
+    
